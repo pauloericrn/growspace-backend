@@ -17,7 +17,7 @@ async function createServer() {
       ? true 
       : [
           'http://localhost:3000',
-          'https://growspace-frontend.vercel.app', // Substitua pelo seu domínio Vercel
+          'https://growspace-swart.vercel.app', // URL do frontend Vercel
           /https:\/\/.*\.vercel\.app$/ // Permite qualquer subdomínio vercel.app
         ],
     credentials: true,
@@ -41,19 +41,7 @@ async function createServer() {
     };
   });
 
-  // Debug endpoint - verificar variáveis
-  fastify.get('/debug', async () => {
-    return {
-      success: true,
-      data: {
-        google_client_id: env.GOOGLE_CLIENT_ID ? '✅ Configurado' : '❌ Não configurado',
-        google_redirect_uri: env.GOOGLE_REDIRECT_URI,
-        node_env: env.NODE_ENV,
-        port: env.PORT,
-        timestamp: new Date().toISOString()
-      }
-    };
-  });
+
 
   // Rota Google OAuth - Iniciar autenticação
   fastify.get('/auth/google', async () => {
@@ -141,23 +129,22 @@ async function createServer() {
         ? '🎉 Autenticação Google + Supabase COMPLETA!'
         : '🎉 Autenticação Google OK (Supabase: fallback mode)';
 
-      return {
-        success: true,
-        data: {
-          user: {
-            id: userResult.user.id,
-            email: userResult.user.email,
-            name: userResult.user.name,
-            avatar: userResult.user.avatar_url,
-            google_id: userResult.user.google_id,
-            verified: userResult.user.email_verified,
-            created_at: userResult.user.created_at,
-            integration_status: isRealUser ? 'complete' : 'fallback'
-          },
-          message: statusMessage,
-          note: isRealUser ? 'Usuário persistido no Supabase' : 'Verificar SUPABASE_SERVICE_KEY para persistência completa'
-        }
-      };
+      // Redirecionar para o frontend com dados do usuário
+      const frontendUrl = process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:3000' 
+        : 'https://growspace-swart.vercel.app'; // URL do frontend Vercel
+        
+      const redirectUrl = `${frontendUrl}/auth/callback?` + 
+        `success=true&` +
+        `user_id=${encodeURIComponent(userResult.user.id)}&` +
+        `email=${encodeURIComponent(userResult.user.email)}&` +
+        `name=${encodeURIComponent(userResult.user.name)}&` +
+        `avatar=${encodeURIComponent(userResult.user.avatar_url || '')}&` +
+        `google_id=${encodeURIComponent(userResult.user.google_id || '')}&` +
+        `verified=${userResult.user.email_verified}&` +
+        `integration_status=${isRealUser ? 'complete' : 'fallback'}`;
+
+      return reply.redirect(redirectUrl);
 
     } catch (error) {
       console.error('Erro no callback OAuth:', error);
