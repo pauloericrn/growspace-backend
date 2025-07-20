@@ -41,6 +41,20 @@ async function createServer() {
     };
   });
 
+  // Debug endpoint - verificar variáveis
+  fastify.get('/debug', async () => {
+    return {
+      success: true,
+      data: {
+        google_client_id: env.GOOGLE_CLIENT_ID ? '✅ Configurado' : '❌ Não configurado',
+        google_redirect_uri: env.GOOGLE_REDIRECT_URI,
+        node_env: env.NODE_ENV,
+        port: env.PORT,
+        timestamp: new Date().toISOString()
+      }
+    };
+  });
+
   // Rota Google OAuth - Iniciar autenticação
   fastify.get('/auth/google', async () => {
     const clientId = env.GOOGLE_CLIENT_ID;
