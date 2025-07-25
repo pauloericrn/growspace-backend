@@ -1,7 +1,11 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { env } from './shared/config/environment.js';
-import { UserService } from './shared/services/user-service.js';
+import { appConfig, getCorsConfig } from './shared/config/app-config.js';
+import { healthRoutes } from './modules/health/presentation/health-routes.js';
+import { emailRoutes } from './modules/email/presentation/email-routes.js';
+import { authRoutes } from './modules/auth/presentation/auth-routes.js';
+import { logger } from './shared/utils/logger.js';
 
 /**
  * Cria e configura servidor Fastify simples
@@ -11,17 +15,16 @@ async function createServer() {
     logger: true
   });
 
-  // CORS configuração para Railway + Vercel
+  // CORS configuração centralizada
   await fastify.register(cors, {
-    origin: process.env.NODE_ENV === 'development' 
-      ? true 
-      : [
-          'http://localhost:3000',
-          'https://growspace-swart.vercel.app', // URL do frontend Vercel
-          /https:\/\/.*\.vercel\.app$/ // Permite qualquer subdomínio vercel.app
-        ],
+    origin: getCorsConfig(),
     credentials: true,
   });
+
+  // Registrar rotas modulares
+  await fastify.register(healthRoutes, { prefix: '/health' });
+  await fastify.register(emailRoutes, { prefix: '/email' });
+  await fastify.register(authRoutes, { prefix: '/auth' });
 
   // Rota hello world
   fastify.get('/', async () => {
@@ -29,132 +32,6 @@ async function createServer() {
       message: 'Hello World from GrowSpace Backend!',
       timestamp: new Date().toISOString() 
     };
-  });
-
-  // Health check
-  fastify.get('/health', async () => {
-    return {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      uptime: Math.floor(process.uptime()),
-      version: '1.0.0'
-    };
-  });
-
-
-
-  // Rota Google OAuth - Iniciar autenticação
-  fastify.get('/auth/google', async () => {
-    const clientId = env.GOOGLE_CLIENT_ID;
-    const redirectUri = env.GOOGLE_REDIRECT_URI;
-    
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `access_type=offline&` +
-      `scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile&` +
-      `prompt=consent&` +
-      `response_type=code&` +
-      `client_id=${clientId}&` +
-      `redirect_uri=${encodeURIComponent(redirectUri)}`;
-
-    return {
-      success: true,
-      data: {
-        authUrl,
-        message: 'Acesse esta URL para fazer login com Google'
-      }
-    };
-  });
-
-  // Callback Google OAuth - Processar retorno
-  fastify.get('/auth/google/callback', async (request, reply) => {
-    try {
-      const { code } = request.query as { code?: string };
-
-      if (!code) {
-        return reply.status(400).send({
-          success: false,
-          error: 'Código de autorização não fornecido'
-        });
-      }
-
-      // Trocar code por access token
-      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          client_id: env.GOOGLE_CLIENT_ID,
-          client_secret: env.GOOGLE_CLIENT_SECRET,
-          code,
-          grant_type: 'authorization_code',
-          redirect_uri: env.GOOGLE_REDIRECT_URI,
-        }),
-      });
-
-      const tokens = await tokenResponse.json();
-
-      if (!tokenResponse.ok) {
-        throw new Error(`Erro ao trocar tokens: ${tokens.error_description}`);
-      }
-
-      // Buscar dados do usuário
-      const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: {
-          Authorization: `Bearer ${tokens.access_token}`,
-        },
-      });
-
-      const googleUserData = await userResponse.json();
-
-      if (!userResponse.ok) {
-        throw new Error('Erro ao buscar dados do usuário');
-      }
-
-      // Integração com Supabase - criar/buscar usuário
-      const userService = new UserService();
-      const userResult = await userService.findOrCreateFromGoogle(googleUserData);
-
-      if (!userResult.success) {
-        return reply.status(500).send({
-          success: false,
-          error: 'Erro ao salvar usuário no banco',
-          details: userResult.error
-        });
-      }
-
-      // Retornar dados do usuário (do banco)
-      const isRealUser = !userResult.user.id.startsWith('fallback-');
-      const statusMessage = isRealUser 
-        ? '🎉 Autenticação Google + Supabase COMPLETA!'
-        : '🎉 Autenticação Google OK (Supabase: fallback mode)';
-
-      // Redirecionar para o frontend com dados do usuário
-      const frontendUrl = process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:3000' 
-        : 'https://growspace-swart.vercel.app'; // URL do frontend Vercel
-        
-      const redirectUrl = `${frontendUrl}/auth/callback?` + 
-        `success=true&` +
-        `user_id=${encodeURIComponent(userResult.user.id)}&` +
-        `email=${encodeURIComponent(userResult.user.email)}&` +
-        `name=${encodeURIComponent(userResult.user.name)}&` +
-        `avatar=${encodeURIComponent(userResult.user.avatar_url || '')}&` +
-        `google_id=${encodeURIComponent(userResult.user.google_id || '')}&` +
-        `verified=${userResult.user.email_verified}&` +
-        `integration_status=${isRealUser ? 'complete' : 'fallback'}`;
-
-      return reply.redirect(redirectUrl);
-
-    } catch (error) {
-      console.error('Erro no callback OAuth:', error);
-      
-      return reply.status(500).send({
-        success: false,
-        error: 'Erro interno no processo de autenticação',
-        details: error instanceof Error ? error.message : 'Erro desconhecido'
-      });
-    }
   });
 
   return fastify;
@@ -172,10 +49,10 @@ async function startServer() {
       host: '0.0.0.0'
     });
 
-    console.log(`🌱 GrowSpace Backend iniciado na porta ${env.PORT}!`);
+    logger.info(`🌱 GrowSpace Backend iniciado na porta ${env.PORT}!`);
 
   } catch (error) {
-    console.error('Erro ao iniciar servidor:', error);
+    logger.error('Erro ao iniciar servidor:', error);
     process.exit(1);
   }
 }

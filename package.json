@@ -29,6 +29,7 @@
     "dotenv": "^17.2.0",
     "fastify": "^4.26.2",
     "googleapis": "^153.0.0",
+    "resend": "^4.7.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

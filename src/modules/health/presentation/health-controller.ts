@@ -51,15 +51,21 @@ export class HealthController {
 
       logger.debug('Health check performed', { uptime, memory: memoryUsage });
 
-      return reply.status(200).send(healthData);
+      return reply.status(200).send({
+        success: true,
+        data: healthData
+      });
 
     } catch (error) {
       logger.error('Health check failed', error);
       
       return reply.status(503).send({
-        status: 'unhealthy',
-        timestamp: new Date().toISOString(),
-        error: 'Sistema temporariamente indisponível'
+        success: false,
+        error: 'Sistema temporariamente indisponível',
+        data: {
+          status: 'unhealthy',
+          timestamp: new Date().toISOString(),
+        }
       });
     }
   }

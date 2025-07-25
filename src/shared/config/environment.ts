@@ -18,6 +18,9 @@ const environmentSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   GOOGLE_REDIRECT_URI: z.string().url(),
+  // Resend Email
+  RESEND_API_KEY: z.string().min(1).optional(),
+  RESEND_FROM_EMAIL: z.string().email().default('onboarding@resend.dev'),
 });
 
 type Environment = z.infer<typeof environmentSchema>;
@@ -38,6 +41,8 @@ function loadEnvironment(): Environment {
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
       GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
+      RESEND_API_KEY: process.env.RESEND_API_KEY,
+      RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
     });
   } catch (error) {
     console.error('❌ Erro nas variáveis de ambiente:', error);
