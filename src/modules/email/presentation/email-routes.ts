@@ -8,6 +8,49 @@ import { EmailController } from './email-controller.js';
 export async function emailRoutes(fastify: FastifyInstance) {
   const emailController = new EmailController();
 
+  // Diagnóstico de configuração de email
+  fastify.get('/diagnostics', {
+    schema: {
+      description: 'Verifica a configuração do serviço de email',
+      tags: ['Email'],
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: {
+                timestamp: { type: 'string' },
+                environment: {
+                  type: 'object',
+                  properties: {
+                    nodeEnv: { type: 'string' },
+                    hasResendApiKey: { type: 'boolean' },
+                    apiKeyLength: { type: 'number' },
+                    fromEmail: { type: 'string' }
+                  }
+                },
+                service: {
+                  type: 'object',
+                  properties: {
+                    type: { type: 'string' },
+                    isMock: { type: 'boolean' }
+                  }
+                },
+                recommendations: {
+                  type: 'array',
+                  items: { type: 'string' }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }, (request, reply) => emailController.getEmailDiagnostics(request, reply));
+
   // Enviar email genérico
   fastify.post('/send', {
     schema: {

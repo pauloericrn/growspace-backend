@@ -28,6 +28,9 @@ export class ResendEmailService implements IEmailService {
       logger.info('Enviando email via Resend', {
         to: data.to,
         subject: data.subject,
+        from: data.from || env.RESEND_FROM_EMAIL,
+        hasApiKey: !!env.RESEND_API_KEY,
+        apiKeyPrefix: env.RESEND_API_KEY ? env.RESEND_API_KEY.substring(0, 8) + '...' : 'N/A',
       });
 
       // Prepara dados para envio
@@ -46,12 +49,26 @@ export class ResendEmailService implements IEmailService {
         emailData.replyTo = data.replyTo;
       }
 
+      logger.debug('Dados preparados para envio via Resend', {
+        emailData: {
+          from: emailData.from,
+          to: emailData.to,
+          subject: emailData.subject,
+          hasHtml: !!emailData.html,
+          hasText: !!emailData.text,
+          hasReplyTo: !!emailData.replyTo,
+        },
+      });
+
       // Envia email via Resend
       const result = await this.resend.emails.send(emailData);
 
       if (result.error) {
         logger.error('Erro ao enviar email via Resend', {
           error: result.error,
+          errorType: typeof result.error,
+          errorKeys: result.error ? Object.keys(result.error) : [],
+          resendResponse: result,
         });
 
         const errorMessage = result.error.message || 
@@ -82,6 +99,10 @@ export class ResendEmailService implements IEmailService {
       logger.error('Erro inesperado ao enviar email', {
         error: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
+        errorType: typeof error,
+        errorConstructor: error?.constructor?.name,
+        resendApiKeyConfigured: !!env.RESEND_API_KEY,
+        fromEmail: env.RESEND_FROM_EMAIL,
       });
 
       return {
