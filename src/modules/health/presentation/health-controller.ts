@@ -1,7 +1,7 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import type { HealthCheckResponse } from '@/shared/types/api.js';
-import { env } from '@/shared/config/environment.js';
-import { logger } from '@/shared/utils/logger.js';
+import type { HealthCheckResponse } from '../../../shared/types/api.js';
+import { env } from '../../../shared/config/environment.js';
+import { logger } from '../../../shared/utils/logger.js';
 
 /**
  * Controller para endpoints de health check e hello world

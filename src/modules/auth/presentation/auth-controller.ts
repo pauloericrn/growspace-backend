@@ -1,7 +1,7 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { AuthUseCases } from '../application/auth-use-cases.js';
-import { UserService } from '@/shared/services/user-service.js';
-import { logger } from '@/shared/utils/logger.js';
+import { UserService } from '../../../shared/services/user-service.js';
+import { logger } from '../../../shared/utils/logger.js';
 
 /**
  * Controller para autenticação

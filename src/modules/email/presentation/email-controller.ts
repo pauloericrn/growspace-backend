@@ -2,9 +2,9 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import { EmailUseCases } from '../application/email-use-cases.js';
 import { ResendEmailService } from '../infrastructure/resend-email-service.js';
 import { MockEmailService } from '../infrastructure/mock-email-service.js';
-import { sendEmailSchema } from '@/shared/types/email.js';
-import { logger } from '@/shared/utils/logger.js';
-import { env } from '@/shared/config/environment.js';
+import { sendEmailSchema } from '../../../shared/types/email.js';
+import { logger } from '../../../shared/utils/logger.js';
+import { env } from '../../../shared/config/environment.js';
 
 /**
  * Controller para endpoints de email

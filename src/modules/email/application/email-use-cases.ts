@@ -1,6 +1,6 @@
-import type { IEmailService, SendEmailRequest, EmailResponse } from '@/shared/types/email.js';
-import { logger } from '@/shared/utils/logger.js';
-import { appConfig, getFrontendUrl } from '@/shared/config/app-config.js';
+import type { IEmailService, SendEmailRequest, EmailResponse } from '../../../shared/types/email.js';
+import { logger } from '../../../shared/utils/logger.js';
+import { appConfig, getFrontendUrl } from '../../../shared/config/app-config.js';
 
 /**
  * Casos de uso para o módulo de email

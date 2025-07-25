@@ -1,8 +1,8 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { UserService } from '@/shared/services/user-service.js';
-import { logger } from '@/shared/utils/logger.js';
-import { env } from '@/shared/config/environment.js';
-import { appConfig, getFrontendUrl } from '@/shared/config/app-config.js';
+import { UserService } from '../../../shared/services/user-service.js';
+import { logger } from '../../../shared/utils/logger.js';
+import { env } from '../../../shared/config/environment.js';
+import { appConfig, getFrontendUrl } from '../../../shared/config/app-config.js';
 
 /**
  * Casos de uso para autenticação
