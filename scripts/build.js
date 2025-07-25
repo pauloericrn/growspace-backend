@@ -43,43 +43,19 @@ function resolvePathAliases(dir) {
 function resolvePathAliasesInFile(filePath) {
   let content = fs.readFileSync(filePath, 'utf8');
   
-  // Substituir @/shared/* por imports relativos
+  // Substituir imports problemáticos do logger
   content = content.replace(
-    /from ['"]@\/shared\/([^'"]+)['"]/g,
-    (match, importPath) => {
-      const relativePath = getRelativePath(filePath, `./shared/${importPath}`);
-      return `from '${relativePath}'`;
-    }
+    /from ['"]\.\.\\\.\.\\\.\.\\shared\/config\/environment\.js['"]/g,
+    "from '../config/environment.js'"
   );
   
-  // Substituir @/modules/* por imports relativos
+  // Substituir outros imports problemáticos
   content = content.replace(
-    /from ['"]@\/modules\/([^'"]+)['"]/g,
+    /from ['"]\.\.\\\.\.\\\.\.\\shared\/([^'"]+)['"]/g,
     (match, importPath) => {
-      const relativePath = getRelativePath(filePath, `./modules/${importPath}`);
-      return `from '${relativePath}'`;
-    }
-  );
-  
-  // Substituir @/* por imports relativos
-  content = content.replace(
-    /from ['"]@\/([^'"]+)['"]/g,
-    (match, importPath) => {
-      const relativePath = getRelativePath(filePath, `./${importPath}`);
-      return `from '${relativePath}'`;
+      return `from '../${importPath}'`;
     }
   );
   
   fs.writeFileSync(filePath, content);
-}
-
-/**
- * Calcula o caminho relativo entre dois arquivos
- */
-function getRelativePath(fromFile, toPath) {
-  const fromDir = path.dirname(fromFile);
-  const relativePath = path.relative(fromDir, toPath);
-  
-  // Garantir que o caminho comece com ./
-  return relativePath.startsWith('.') ? relativePath : `./${relativePath}`;
 } 
