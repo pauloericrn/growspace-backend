@@ -24,11 +24,11 @@
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["src/*"],
-      "@/shared/*": ["src/shared/*"],
-      "@/modules/*": ["src/modules/*"]
+      "@/*": ["./*"],
+      "@/shared/*": ["./shared/*"],
+      "@/modules/*": ["./modules/*"]
     }
   },
   "include": [
