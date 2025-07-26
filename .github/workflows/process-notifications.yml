@@ -1,0 +1,54 @@
+name: Process Notifications
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # A cada 30 minutos
+  workflow_dispatch:  # Permite execução manual
+
+jobs:
+  process-notifications:
+    runs-on: ubuntu-latest
+    name: Process pending notifications
+    steps:
+      - name: Process notifications
+        run: |
+          echo "🚀 Iniciando processamento de notificações..."
+          
+          # URL da aplicação no Railway
+          APP_URL="https://growspace-backend-production.up.railway.app"
+          
+          # Fazer requisição para processar notificações
+          response=$(curl -s -w "\n%{http_code}" -X GET "$APP_URL/email/process-and-send")
+          
+          # Separar body da resposta do status code
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n -1)
+          
+          echo "📊 Status Code: $http_code"
+          echo "📋 Resposta:"
+          echo "$body" | jq '.' 2>/dev/null || echo "$body"
+          
+          # Verificar se foi bem-sucedido
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ Processamento concluído com sucesso!"
+            
+            # Extrair estatísticas
+            processed=$(echo "$body" | jq -r '.data.processed // 0')
+            sent=$(echo "$body" | jq -r '.data.sent // 0')
+            failed=$(echo "$body" | jq -r '.data.failed // 0')
+            success_rate=$(echo "$body" | jq -r '.data.successRate // 0')
+            
+            echo "📊 Estatísticas:"
+            echo "   📧 Processadas: $processed"
+            echo "   ✅ Enviadas: $sent"
+            echo "   ❌ Falhas: $failed"
+            echo "   📈 Taxa de sucesso: ${success_rate}%"
+            
+            if [ "$failed" -gt 0 ]; then
+              echo "⚠️  Algumas notificações falharam!"
+              exit 1
+            fi
+          else
+            echo "❌ Erro no processamento: HTTP $http_code"
+            echo "$body"
+            exit 1
+          fi 
