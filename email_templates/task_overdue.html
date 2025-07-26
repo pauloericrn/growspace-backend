@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefa Atrasada - GrowSpace</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+        .task-card { background: white; border-left: 4px solid #ef4444; padding: 20px; margin: 20px 0; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .overdue-badge { display: inline-block; background: #fef2f2; color: #dc2626; padding: 8px 16px; border-radius: 20px; font-weight: bold; }
+        .btn { display: inline-block; background: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 10px 0; }
+        .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+        .plant-info { background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 5px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌱 GrowSpace</h1>
+        <p>Alerta de Tarefa Atrasada</p>
+    </div>
+    
+    <div class="content">
+        <h2>Olá, {{user_name}}!</h2>
+        
+        <div class="overdue-badge">
+            ⚠️ TAREFA ATRASADA HÁ {{days_overdue}} DIA(S)
+        </div>
+        
+        <p>Você tem uma tarefa que está atrasada:</p>
+        
+        <div class="task-card">
+            <h3>{{task_title}}</h3>
+            {{#if task_description}}
+            <p><strong>Descrição:</strong> {{task_description}}</p>
+            {{/if}}
+            
+            <p><strong>Data de Vencimento:</strong> {{due_date}}</p>
+            <p><strong>Dias Atrasada:</strong> {{days_overdue}} dia(s)</p>
+            
+            {{#if plant_name}}
+            <div class="plant-info">
+                <p><strong>🌿 Planta:</strong> {{plant_name}}</p>
+            </div>
+            {{/if}}
+        </div>
+        
+        <a href="{{app_url}}" class="btn">Completar Tarefa Agora</a>
+        
+        <div class="footer">
+            <p>Este é um alerta automático do GrowSpace.</p>
+            <p>Complete a tarefa o quanto antes para manter seu cultivo em dia.</p>
+        </div>
+    </div>
+</body>
+</html>
+  

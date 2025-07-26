@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lembrete de Tarefa - GrowSpace</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+        .task-card { background: white; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .priority-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .priority-alto { background: #fef2f2; color: #dc2626; }
+        .priority-medio { background: #fffbeb; color: #d97706; }
+        .priority-baixo { background: #f0fdf4; color: #16a34a; }
+        .btn { display: inline-block; background: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 10px 0; }
+        .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+        .plant-info { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 5px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌱 GrowSpace</h1>
+        <p>Lembrete de Tarefa</p>
+    </div>
+    
+    <div class="content">
+        <h2>Olá, {{user_name}}!</h2>
+        
+        <p>Você tem uma tarefa agendada para hoje:</p>
+        
+        <div class="task-card">
+            <h3>{{task_title}}</h3>
+            {{#if task_description}}
+            <p><strong>Descrição:</strong> {{task_description}}</p>
+            {{/if}}
+            
+            <p><strong>Prioridade:</strong> 
+                <span class="priority-badge priority-{{task_priority}}">{{task_priority}}</span>
+            </p>
+            
+            <p><strong>Data:</strong> {{due_date}}</p>
+            
+            {{#if plant_name}}
+            <div class="plant-info">
+                <p><strong>🌿 Planta:</strong> {{plant_name}}</p>
+            </div>
+            {{/if}}
+        </div>
+        
+        <a href="{{app_url}}" class="btn">Ver Tarefa no GrowSpace</a>
+        
+        <div class="footer">
+            <p>Este é um lembrete automático do GrowSpace.</p>
+            <p>Para cancelar notificações, acesse suas configurações.</p>
+        </div>
+    </div>
+</body>
+</html>
+  

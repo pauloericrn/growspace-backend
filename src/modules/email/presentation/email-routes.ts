@@ -51,6 +51,55 @@ export async function emailRoutes(fastify: FastifyInstance) {
     }
   }, (request, reply) => emailController.getEmailDiagnostics(request, reply));
 
+  // Processar notificações pendentes
+  fastify.get('/process-notifications', {
+    schema: {
+      description: 'Processa notificações pendentes do banco de dados',
+      tags: ['Email'],
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: {
+                processed: { type: 'number' },
+                emailData: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      notificationId: { type: 'string' },
+                      to: { type: 'array', items: { type: 'string' } },
+                      subject: { type: 'string' },
+                      html: { type: 'string' },
+                      text: { type: 'string' },
+                      type: { type: 'string' }
+                    }
+                  }
+                },
+                notifications: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string' },
+                      type: { type: 'string' },
+                      userEmail: { type: 'string' },
+                      status: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }, (request, reply) => emailController.processPendingNotifications(request, reply));
+
   // Enviar email genérico
   fastify.post('/send', {
     schema: {
@@ -245,4 +294,43 @@ export async function emailRoutes(fastify: FastifyInstance) {
       }
     }
   }, (request, reply) => emailController.sendPasswordResetEmail(request, reply));
+
+  // Rota para processar e enviar notificações automaticamente
+  fastify.get('/process-and-send', {
+    schema: {
+      description: 'Processa e envia notificações pendentes automaticamente',
+      tags: ['Email'],
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: {
+                processed: { type: 'number' },
+                sent: { type: 'number' },
+                failed: { type: 'number' },
+                successRate: { type: 'number' },
+                processingTime: { type: 'number' },
+                details: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      notificationId: { type: 'string' },
+                      status: { type: 'string' },
+                      emailId: { type: 'string' },
+                      error: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }, (request, reply) => emailController.processAndSendNotifications(request, reply));
 } 
