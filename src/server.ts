@@ -6,6 +6,7 @@ import { healthRoutes } from './modules/health/presentation/health-routes.js';
 import { emailRoutes } from './modules/email/presentation/email-routes.js';
 import { authRoutes } from './modules/auth/presentation/auth-routes.js';
 import { logger } from './shared/utils/logger.js';
+import { nowUTC } from './shared/utils/date-utils.js';
 
 /**
  * Cria e configura servidor Fastify simples
@@ -30,7 +31,7 @@ async function createServer() {
   fastify.get('/', async () => {
     return { 
       message: 'Hello World from GrowSpace Backend!',
-      timestamp: new Date().toISOString() 
+      timestamp: nowUTC().toISOString() 
     };
   });
 

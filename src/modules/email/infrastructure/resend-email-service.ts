@@ -2,6 +2,7 @@ import { Resend } from 'resend';
 import { randomUUID } from 'crypto';
 import { env } from '../../../shared/config/environment.js';
 import { logger } from '../../../shared/utils/logger.js';
+import { nowUTC } from '../../../shared/utils/date-utils.js';
 import type { IEmailService, SendEmailRequest, EmailResponse } from '../../../shared/types/email.js';
 import { EmailEntity } from '../domain/entities/email-entity.js';
 
@@ -91,7 +92,7 @@ export class ResendEmailService implements IEmailService {
           from: data.from || env.RESEND_FROM_EMAIL,
           to: data.to,
           subject: data.subject,
-          createdAt: new Date().toISOString(),
+          createdAt: nowUTC().toISOString(),
         },
       };
 

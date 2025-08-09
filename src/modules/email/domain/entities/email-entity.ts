@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { nowUTC } from '../../../../shared/utils/date-utils.js';
 
 /**
  * Entidade de Email para o domínio
@@ -13,7 +14,7 @@ export class EmailEntity {
     public readonly html: string,
     public readonly text?: string,
     public readonly replyTo?: string,
-    public readonly createdAt: Date = new Date(),
+    public readonly createdAt: Date = nowUTC(),
     public readonly status: 'pending' | 'sent' | 'failed' = 'pending'
   ) {}
 

@@ -1,5 +1,6 @@
 import type { IEmailService, SendEmailRequest, EmailResponse } from '../../../shared/types/email.js';
 import { logger } from '../../../shared/utils/logger.js';
+import { nowUTC } from '../../../shared/utils/date-utils.js';
 
 /**
  * Serviço de email mock para testes
@@ -27,7 +28,7 @@ export class MockEmailService implements IEmailService {
         from: data.from || 'mock@resend.dev',
         to: data.to,
         subject: data.subject,
-        createdAt: new Date().toISOString(),
+        createdAt: nowUTC().toISOString(),
       },
     };
   }

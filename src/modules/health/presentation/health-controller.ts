@@ -2,6 +2,7 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { HealthCheckResponse } from '../../../shared/types/api.js';
 import { env } from '../../../shared/config/environment.js';
 import { logger } from '../../../shared/utils/logger.js';
+import { nowUTC } from '../../../shared/utils/date-utils.js';
 
 /**
  * Controller para endpoints de health check e hello world
@@ -19,7 +20,7 @@ export class HealthController {
       success: true,
       data: {
         message: '🌱 GrowSpace Backend está funcionando!',
-        timestamp: new Date().toISOString(),
+        timestamp: nowUTC().toISOString(),
         environment: env.NODE_ENV,
       }
     });
@@ -35,7 +36,7 @@ export class HealthController {
 
       const healthData: HealthCheckResponse = {
         status: 'healthy',
-        timestamp: new Date().toISOString(),
+        timestamp: nowUTC().toISOString(),
         uptime: Math.floor(uptime),
         version: '1.0.0',
         environment: env.NODE_ENV,
@@ -64,7 +65,7 @@ export class HealthController {
         error: 'Sistema temporariamente indisponível',
         data: {
           status: 'unhealthy',
-          timestamp: new Date().toISOString(),
+          timestamp: nowUTC().toISOString(),
         }
       });
     }

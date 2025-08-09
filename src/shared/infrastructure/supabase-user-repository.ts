@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { env } from '../config/environment.js';
 import type { User, CreateUserData, GoogleUser } from '../types/user.js';
+import { nowUTC } from '../utils/date-utils.js';
 
 /**
  * Repository para usuários no Supabase
@@ -115,8 +116,8 @@ export class SupabaseUserRepository {
           avatar_url: userData.avatar_url,
           email_verified: userData.email_verified || true,
           onboarding_completed: false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+          created_at: nowUTC().toISOString(),
+          updated_at: nowUTC().toISOString(),
         };
 
         const { data: profile, error: profileError } = await this.supabase
@@ -169,8 +170,8 @@ export class SupabaseUserRepository {
       avatar_url: userData.avatar_url || null,
       google_id: userData.google_id || null,
       email_verified: userData.email_verified || false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      created_at: nowUTC().toISOString(),
+      updated_at: nowUTC().toISOString(),
     };
 
     console.log('✅ [Repository] Usuário fallback criado - OAuth funcionando!');
@@ -188,7 +189,7 @@ export class SupabaseUserRepository {
       console.log('📊 [Repository] Dados para atualizar:', userData);
 
       const updateData: any = {
-        updated_at: new Date().toISOString(),
+        updated_at: nowUTC().toISOString(),
       };
 
       // Adicionar apenas campos que não são undefined

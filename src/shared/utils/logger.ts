@@ -1,4 +1,5 @@
 import { env } from '../config/environment.js';
+import { nowUTC } from './date-utils.js';
 
 type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 
@@ -35,7 +36,7 @@ class Logger {
   private formatMessage(level: LogLevel, message: string, ...args: unknown[]): void {
     if (!this.shouldLog(level)) return;
 
-    const timestamp = new Date().toISOString();
+    const timestamp = nowUTC().toISOString();
     const color = this.colors[level];
     const levelText = level.toUpperCase().padEnd(5);
     
